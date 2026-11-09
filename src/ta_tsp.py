@@ -17,7 +17,6 @@ def lexo_instancen(emri_skedarit):
         for rreshti in skedari:
             rreshti = rreshti.strip()
 
-            # Kapërcejmë rreshtat bosh dhe komentet
             if rreshti == "" or rreshti.startswith("#"):
                 continue
 
@@ -72,7 +71,6 @@ def lexo_instancen(emri_skedarit):
 def llogarit_koston(n, harqet, marredheniet, rruga):
     """Llogarit koston e rrugës duke zbatuar trigger-at sipas rendit."""
 
-    # Rruga duhet të fillojë dhe të mbarojë te depoja 0
     if len(rruga) != n + 1 or rruga[0] != 0 or rruga[-1] != 0:
         raise ValueError(
             "Rruga duhet të fillojë dhe të përfundojë te nyja 0 "
@@ -114,7 +112,9 @@ def llogarit_koston(n, harqet, marredheniet, rruga):
         id_harku = harku_sipas_nyjeve.get((prej, deri))
 
         if id_harku is None:
-            raise ValueError(f"Nuk ekziston harku nga nyja {prej} te nyja {deri}.")
+            raise ValueError(
+                f"Nuk ekziston harku nga nyja {prej} te nyja {deri}."
+            )
 
         # Shtojmë koston aktuale të harkut
         kosto_totale += kostot_aktuale[id_harku]
@@ -133,6 +133,57 @@ def llogarit_koston(n, harqet, marredheniet, rruga):
     return kosto_totale
 
 
+def nderto_rruge_fillestare(n, harqet):
+    """Ndërton një rrugë greedy duke zgjedhur harkun më të lirë të mundshëm."""
+
+    # Grupojmë harqet sipas nyjës prej nga nisen
+    harqet_nga_nyja = {}
+
+    for harku in harqet.values():
+        if harku.prej not in harqet_nga_nyja:
+            harqet_nga_nyja[harku.prej] = []
+
+        harqet_nga_nyja[harku.prej].append(harku)
+
+    rruga = [0]
+    nyjet_papervizituara = set(range(1, n))
+
+    while nyjet_papervizituara:
+        nyja_aktuale = rruga[-1]
+
+        kandidatet = [
+            harku
+            for harku in harqet_nga_nyja.get(nyja_aktuale, [])
+            if harku.deri in nyjet_papervizituara
+        ]
+
+        if not kandidatet:
+            raise ValueError(
+                f"Nuk mund të vazhdohet nga nyja {nyja_aktuale}. "
+                "Greedy nuk arriti të ndërtojë një cikël."
+            )
+
+        # Zgjedhim harkun me koston fillestare më të ulët
+        harku_zgjedhur = min(kandidatet, key=lambda harku: harku.kosto)
+
+        rruga.append(harku_zgjedhur.deri)
+        nyjet_papervizituara.remove(harku_zgjedhur.deri)
+
+    # Kontrollojmë nëse mund të kthehemi te depoja 0
+    ka_hark_kthyes = any(
+        harku.prej == rruga[-1] and harku.deri == 0
+        for harku in harqet.values()
+    )
+
+    if not ka_hark_kthyes:
+        raise ValueError(
+            f"Nuk ka hark kthyes nga nyja {rruga[-1]} te depoja 0."
+        )
+
+    rruga.append(0)
+    return rruga
+
+
 if __name__ == "__main__":
     # Lexojmë instancën demonstrative
     n, harqet, marredheniet = lexo_instancen("../instances/demo.txt")
@@ -141,10 +192,11 @@ if __name__ == "__main__":
     print("Numri i harqeve:", len(harqet))
     print("Numri i marrëdhënieve:", len(marredheniet))
 
-    # Rrugë demonstrative: 0 -> 2 -> 1 -> 3 -> 0
-    rruga = [0, 2, 1, 3, 0]
+    # Programi e ndërton rrugën vetë, pa e shkruar manualisht
+    rruga = nderto_rruge_fillestare(n, harqet)
 
+    # Llogarisim koston duke marrë parasysh trigger-at
     kosto = llogarit_koston(n, harqet, marredheniet, rruga)
 
-    print("Rruga:", rruga)
+    print("Rruga e ndërtuar:", rruga)
     print("Kostoja totale:", kosto)
