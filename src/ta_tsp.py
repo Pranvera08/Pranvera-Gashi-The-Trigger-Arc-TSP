@@ -1,7 +1,10 @@
 from dataclasses import dataclass
 
+import csv
 import math
 import random
+import time
+from pathlib import Path
 
 @dataclass
 class Harku:
@@ -251,16 +254,101 @@ def simulated_annealing(n, harqet, marredheniet, iteracione=10000, seed=7):
 
 
 if __name__ == "__main__":
-    # Lexojmë instancën demonstrative
-    n, harqet, marredheniet = lexo_instancen("../instances/demo.txt")
+    # Gjejmë dosjen kryesore të projektit
+    dosja_projektit = Path(__file__).resolve().parent.parent
+    skedari_instancës = dosja_projektit / "instances" / "demo.txt"
+    skedari_rezultateve = dosja_projektit / "results" / "results_template.csv"
+
+    # Lexojmë instancën
+    n, harqet, marredheniet = lexo_instancen(skedari_instancës)
 
     print("Numri i nyjeve:", n)
     print("Numri i harqeve:", len(harqet))
     print("Numri i marrëdhënieve:", len(marredheniet))
 
-    rruga, kosto = simulated_annealing(
-        n, harqet, marredheniet, iteracione=10000, seed=7
+    kolonat = [
+        "instance",
+        "algorithm",
+        "seed",
+        "iterations",
+        "cost",
+        "seconds",
+        "official_validator_valid",
+    ]
+
+    rezultatet = []
+
+    # Llogarisim rezultatin e metodës greedy
+    rruga_greedy = nderto_rruge_fillestare(n, harqet)
+    kosto_greedy = llogarit_koston(
+        n, harqet, marredheniet, rruga_greedy
     )
 
-    print("Rruga e ndërtuar:", rruga)
-    print("Kostoja totale:", kosto)
+    print("\nGreedy:")
+    print("Rruga:", rruga_greedy)
+    print("Kostoja:", kosto_greedy)
+
+    rezultatet.append({
+        "instance": "demo",
+        "algorithm": "Greedy",
+        "seed": 0,
+        "iterations": 0,
+        "cost": kosto_greedy,
+        "seconds": "",
+        "official_validator_valid": "N/A - instancë demonstrative",
+    })
+
+    # Ekzekutojmë Simulated Annealing me pesë seed-e
+    iteracione = 10000
+
+    print("\nSimulated Annealing:")
+
+    for seed in range(1, 6):
+        fillimi = time.perf_counter()
+
+        rruga, kosto = simulated_annealing(
+            n,
+            harqet,
+            marredheniet,
+            iteracione=iteracione,
+            seed=seed,
+        )
+
+        koha = time.perf_counter() - fillimi
+
+        print(
+            f"Seed {seed}: rruga={rruga}, "
+            f"kostoja={kosto}, koha={koha:.6f} sekonda"
+        )
+
+        rezultatet.append({
+            "instance": "demo",
+            "algorithm": "Simulated Annealing",
+            "seed": seed,
+            "iterations": iteracione,
+            "cost": kosto,
+            "seconds": round(koha, 6),
+            "official_validator_valid": "N/A - instancë demonstrative",
+        })
+
+    # Shtojmë rezultatet në skedarin CSV
+    ka_te_dhena = (
+        skedari_rezultateve.exists()
+        and skedari_rezultateve.stat().st_size > 0
+    )
+
+    with open(
+        skedari_rezultateve,
+        "a",
+        newline="",
+        encoding="utf-8",
+    ) as skedari:
+        shkruesi = csv.DictWriter(skedari, fieldnames=kolonat)
+
+        if not ka_te_dhena:
+            shkruesi.writeheader()
+
+        shkruesi.writerows(rezultatet)
+
+    print("\nRezultatet u ruajtën te:")
+    print(skedari_rezultateve)

@@ -1,1 +1,8 @@
 instance,algorithm,seed,iterations,cost,seconds,official_validator_valid
+demo,Greedy,0,0,32,,N/A - instancë demonstrative
+demo,Simulated Annealing,1,10000,27,0.141529,N/A - instancë demonstrative
+demo,Simulated Annealing,2,10000,27,0.138609,N/A - instancë demonstrative
+demo,Simulated Annealing,3,10000,27,0.136271,N/A - instancë demonstrative
+demo,Simulated Annealing,4,10000,27,0.140535,N/A - instancë demonstrative
+demo,Simulated Annealing,5,10000,27,0.129375,N/A - instancë demonstrative
+
