@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+import math
+import random
 
 @dataclass
 class Harku:
@@ -183,6 +185,70 @@ def nderto_rruge_fillestare(n, harqet):
     rruga.append(0)
     return rruga
 
+def simulated_annealing(n, harqet, marredheniet, iteracione=10000, seed=7):
+    """Përpiqet ta përmirësojë rrugën fillestare greedy."""
+    gjeneratori = random.Random(seed)
+
+    rruga_aktuale = nderto_rruge_fillestare(n, harqet)
+    kosto_aktuale = llogarit_koston(
+        n, harqet, marredheniet, rruga_aktuale
+    )
+
+    rruga_me_e_mire = rruga_aktuale[:]
+    kosto_me_e_mire = kosto_aktuale
+
+    temperatura = max(1.0, kosto_aktuale * 0.15)
+    ftohja = 0.9995
+
+    for _ in range(iteracione):
+        # Duhet të ketë të paktën dy nyje jo-depo për t'i ndërruar
+        if n <= 2:
+            break
+
+        rruga_kandidate = rruga_aktuale[:]
+
+        # Zgjedhim dy pozita brenda rrugës dhe i ndryshojmë
+        pozita_1, pozita_2 = sorted(
+            gjeneratori.sample(range(1, n), 2)
+        )
+
+        if gjeneratori.random() < 0.5:
+            rruga_kandidate[pozita_1], rruga_kandidate[pozita_2] = (
+                rruga_kandidate[pozita_2],
+                rruga_kandidate[pozita_1],
+            )
+        else:
+            rruga_kandidate[pozita_1:pozita_2 + 1] = reversed(
+                rruga_kandidate[pozita_1:pozita_2 + 1]
+            )
+
+        try:
+            kosto_kandidate = llogarit_koston(
+                n, harqet, marredheniet, rruga_kandidate
+            )
+        except ValueError:
+            # Kandidati nuk ka harqet e nevojshme, prandaj e kalojmë
+            temperatura *= ftohja
+            continue
+
+        ndryshimi = kosto_kandidate - kosto_aktuale
+
+        # Pranojmë gjithmonë përmirësimet.
+        # Ndonjëherë pranojmë edhe zgjidhje më të kushtueshme.
+        if ndryshimi < 0 or gjeneratori.random() < math.exp(
+            -ndryshimi / max(temperatura, 0.000001)
+        ):
+            rruga_aktuale = rruga_kandidate
+            kosto_aktuale = kosto_kandidate
+
+        if kosto_kandidate < kosto_me_e_mire:
+            rruga_me_e_mire = rruga_kandidate[:]
+            kosto_me_e_mire = kosto_kandidate
+
+        temperatura *= ftohja
+
+    return rruga_me_e_mire, kosto_me_e_mire
+
 
 if __name__ == "__main__":
     # Lexojmë instancën demonstrative
@@ -192,11 +258,9 @@ if __name__ == "__main__":
     print("Numri i harqeve:", len(harqet))
     print("Numri i marrëdhënieve:", len(marredheniet))
 
-    # Programi e ndërton rrugën vetë, pa e shkruar manualisht
-    rruga = nderto_rruge_fillestare(n, harqet)
-
-    # Llogarisim koston duke marrë parasysh trigger-at
-    kosto = llogarit_koston(n, harqet, marredheniet, rruga)
+    rruga, kosto = simulated_annealing(
+        n, harqet, marredheniet, iteracione=10000, seed=7
+    )
 
     print("Rruga e ndërtuar:", rruga)
     print("Kostoja totale:", kosto)
