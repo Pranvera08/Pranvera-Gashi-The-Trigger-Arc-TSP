@@ -8,3 +8,16 @@ demo,Simulated Annealing,5,10000,27,0.129375,N/A - instancë demonstrative
 
 grf1,Backtracking construction,0,0,123.44,,not_checked
 grf1,Simulated Annealing,1,100,123.44,0.125799,not_checked
+grf1,Backtracking construction,0,0,123.44,,not_checked
+grf1,Simulated Annealing,1,1000,123.44,1.140124,not_checked
+grf1,Simulated Annealing,2,1000,123.44,1.097061,not_checked
+grf1,Simulated Annealing,3,1000,123.44,1.061603,not_checked
+grf1,Simulated Annealing,4,1000,123.44,1.104408,not_checked
+grf1,Simulated Annealing,5,1000,123.44,1.069408,not_checked
+grf1,Backtracking construction,0,0,123.44,,not_checked
+grf1,Simulated Annealing,1,10000,113.77,12.308572,not_checked
+grf1,Backtracking construction,0,0,123.44,,not_checked
+grf1,Simulated Annealing,2,10000,111.77000000000001,11.043739,not_checked
+grf1,Simulated Annealing,3,10000,117.18000000000002,11.022068,not_checked
+grf1,Simulated Annealing,4,10000,113.41,10.864203,not_checked
+grf1,Simulated Annealing,5,10000,111.34000000000003,10.879109,not_checked

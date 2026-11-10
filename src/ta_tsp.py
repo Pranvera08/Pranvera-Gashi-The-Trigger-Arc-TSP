@@ -311,11 +311,11 @@ if __name__ == "__main__":
     })
 
     # Prova fillestare e Simulated Annealing: 100 iteracione, një seed
-    iteracione = 100
+    iteracione = 10000
 
     print("\nSimulated Annealing:")
 
-    for seed in range(1, 2):
+    for seed in range(2, 6):
         fillimi = time.perf_counter()
 
         rruga, kosto = simulated_annealing(
