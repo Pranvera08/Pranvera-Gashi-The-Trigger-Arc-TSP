@@ -6,12 +6,13 @@ import random
 import time
 from pathlib import Path
 
+
 @dataclass
 class Harku:
     id: int
     prej: int
     deri: int
-    kosto: int
+    kosto: float
 
 
 def lexo_instancen(emri_skedarit):
@@ -25,7 +26,17 @@ def lexo_instancen(emri_skedarit):
             if rreshti == "" or rreshti.startswith("#"):
                 continue
 
-            rreshtat.append([int(numri) for numri in rreshti.split()])
+            vlera = []
+
+            for tekst in rreshti.split():
+                numer = float(tekst)
+
+                if numer.is_integer():
+                    vlera.append(int(numer))
+                else:
+                    vlera.append(numer)
+
+            rreshtat.append(vlera)
 
     if not rreshtat:
         raise ValueError("Skedari i instancës është bosh.")
@@ -103,14 +114,10 @@ def llogarit_koston(n, harqet, marredheniet, rruga):
 
     for marredhenia in marredheniet:
         id_trigger = marredhenia["trigger"]
-
-        if id_trigger not in triggerat_sipas_harkut:
-            triggerat_sipas_harkut[id_trigger] = []
-
-        triggerat_sipas_harkut[id_trigger].append(marredhenia)
+        triggerat_sipas_harkut.setdefault(id_trigger, []).append(marredhenia)
 
     harqet_e_kaluara = set()
-    kosto_totale = 0
+    kosto_totale = 0.0
 
     # Kalojmë nëpër harqet e rrugës sipas rendit
     for prej, deri in zip(rruga, rruga[1:]):
@@ -139,22 +146,32 @@ def llogarit_koston(n, harqet, marredheniet, rruga):
 
 
 def nderto_rruge_fillestare(n, harqet):
-    """Ndërton një rrugë greedy duke zgjedhur harkun më të lirë të mundshëm."""
+    """Kërkon një cikël fillestar, duke u kthyer pas kur ngec."""
 
-    # Grupojmë harqet sipas nyjës prej nga nisen
     harqet_nga_nyja = {}
 
     for harku in harqet.values():
-        if harku.prej not in harqet_nga_nyja:
-            harqet_nga_nyja[harku.prej] = []
+        harqet_nga_nyja.setdefault(harku.prej, []).append(harku)
 
-        harqet_nga_nyja[harku.prej].append(harku)
+    lidhjet = {
+        (harku.prej, harku.deri)
+        for harku in harqet.values()
+    }
 
     rruga = [0]
     nyjet_papervizituara = set(range(1, n))
+    vizita = 0
+    kufiri_i_kerkimit = 1_000_000
 
-    while nyjet_papervizituara:
-        nyja_aktuale = rruga[-1]
+    def kerko(nyja_aktuale):
+        nonlocal vizita
+        vizita += 1
+
+        if vizita > kufiri_i_kerkimit:
+            return False
+
+        if not nyjet_papervizituara:
+            return (nyja_aktuale, 0) in lidhjet
 
         kandidatet = [
             harku
@@ -162,34 +179,33 @@ def nderto_rruge_fillestare(n, harqet):
             if harku.deri in nyjet_papervizituara
         ]
 
-        if not kandidatet:
-            raise ValueError(
-                f"Nuk mund të vazhdohet nga nyja {nyja_aktuale}. "
-                "Greedy nuk arriti të ndërtojë një cikël."
-            )
+        # Provojmë fillimisht harqet me kosto më të ulët
+        kandidatet.sort(key=lambda harku: harku.kosto)
 
-        # Zgjedhim harkun me koston fillestare më të ulët
-        harku_zgjedhur = min(kandidatet, key=lambda harku: harku.kosto)
+        for harku in kandidatet:
+            rruga.append(harku.deri)
+            nyjet_papervizituara.remove(harku.deri)
 
-        rruga.append(harku_zgjedhur.deri)
-        nyjet_papervizituara.remove(harku_zgjedhur.deri)
+            if kerko(harku.deri):
+                return True
 
-    # Kontrollojmë nëse mund të kthehemi te depoja 0
-    ka_hark_kthyes = any(
-        harku.prej == rruga[-1] and harku.deri == 0
-        for harku in harqet.values()
-    )
+            # Kthehemi pas dhe provojmë një hark tjetër
+            nyjet_papervizituara.add(harku.deri)
+            rruga.pop()
 
-    if not ka_hark_kthyes:
+        return False
+
+    if not kerko(0):
         raise ValueError(
-            f"Nuk ka hark kthyes nga nyja {rruga[-1]} te depoja 0."
+            "Nuk u gjet cikël fillestar brenda kufirit të kërkimit."
         )
 
     rruga.append(0)
     return rruga
 
+
 def simulated_annealing(n, harqet, marredheniet, iteracione=10000, seed=7):
-    """Përpiqet ta përmirësojë rrugën fillestare greedy."""
+    """Përpiqet ta përmirësojë rrugën fillestare."""
     gjeneratori = random.Random(seed)
 
     rruga_aktuale = nderto_rruge_fillestare(n, harqet)
@@ -204,7 +220,6 @@ def simulated_annealing(n, harqet, marredheniet, iteracione=10000, seed=7):
     ftohja = 0.9995
 
     for _ in range(iteracione):
-        # Duhet të ketë të paktën dy nyje jo-depo për t'i ndërruar
         if n <= 2:
             break
 
@@ -230,14 +245,12 @@ def simulated_annealing(n, harqet, marredheniet, iteracione=10000, seed=7):
                 n, harqet, marredheniet, rruga_kandidate
             )
         except ValueError:
-            # Kandidati nuk ka harqet e nevojshme, prandaj e kalojmë
             temperatura *= ftohja
             continue
 
         ndryshimi = kosto_kandidate - kosto_aktuale
 
-        # Pranojmë gjithmonë përmirësimet.
-        # Ndonjëherë pranojmë edhe zgjidhje më të kushtueshme.
+        # Pranojmë përmirësimet dhe nganjëherë edhe zgjidhje më të kushtueshme
         if ndryshimi < 0 or gjeneratori.random() < math.exp(
             -ndryshimi / max(temperatura, 0.000001)
         ):
@@ -254,9 +267,8 @@ def simulated_annealing(n, harqet, marredheniet, iteracione=10000, seed=7):
 
 
 if __name__ == "__main__":
-    # Gjejmë dosjen kryesore të projektit
     dosja_projektit = Path(__file__).resolve().parent.parent
-    skedari_instancës = dosja_projektit / "instances" / "demo.txt"
+    skedari_instancës = dosja_projektit / "instances" / "grf1.txt"
     skedari_rezultateve = dosja_projektit / "results" / "results_template.csv"
 
     # Lexojmë instancën
@@ -278,32 +290,32 @@ if __name__ == "__main__":
 
     rezultatet = []
 
-    # Llogarisim rezultatin e metodës greedy
-    rruga_greedy = nderto_rruge_fillestare(n, harqet)
-    kosto_greedy = llogarit_koston(
-        n, harqet, marredheniet, rruga_greedy
+    # Gjejmë një rrugë fillestare me kërkim dhe kthim pas
+    rruga_fillestare = nderto_rruge_fillestare(n, harqet)
+    kosto_fillestare = llogarit_koston(
+        n, harqet, marredheniet, rruga_fillestare
     )
 
-    print("\nGreedy:")
-    print("Rruga:", rruga_greedy)
-    print("Kostoja:", kosto_greedy)
+    print("\nNdërtim me kthim pas:")
+    print("Rruga:", rruga_fillestare)
+    print("Kostoja:", kosto_fillestare)
 
     rezultatet.append({
-        "instance": "demo",
-        "algorithm": "Greedy",
+        "instance": "grf1",
+        "algorithm": "Backtracking construction",
         "seed": 0,
         "iterations": 0,
-        "cost": kosto_greedy,
+        "cost": kosto_fillestare,
         "seconds": "",
-        "official_validator_valid": "N/A - instancë demonstrative",
+        "official_validator_valid": "not_checked",
     })
 
-    # Ekzekutojmë Simulated Annealing me pesë seed-e
-    iteracione = 10000
+    # Prova fillestare e Simulated Annealing: 100 iteracione, një seed
+    iteracione = 100
 
     print("\nSimulated Annealing:")
 
-    for seed in range(1, 6):
+    for seed in range(1, 2):
         fillimi = time.perf_counter()
 
         rruga, kosto = simulated_annealing(
@@ -322,13 +334,13 @@ if __name__ == "__main__":
         )
 
         rezultatet.append({
-            "instance": "demo",
+            "instance": "grf1",
             "algorithm": "Simulated Annealing",
             "seed": seed,
             "iterations": iteracione,
             "cost": kosto,
             "seconds": round(koha, 6),
-            "official_validator_valid": "N/A - instancë demonstrative",
+            "official_validator_valid": "not_checked",
         })
 
     # Shtojmë rezultatet në skedarin CSV

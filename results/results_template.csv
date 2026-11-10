@@ -6,3 +6,5 @@ demo,Simulated Annealing,3,10000,27,0.136271,N/A - instancë demonstrative
 demo,Simulated Annealing,4,10000,27,0.140535,N/A - instancë demonstrative
 demo,Simulated Annealing,5,10000,27,0.129375,N/A - instancë demonstrative
 
+grf1,Backtracking construction,0,0,123.44,,not_checked
+grf1,Simulated Annealing,1,100,123.44,0.125799,not_checked
