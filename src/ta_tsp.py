@@ -316,7 +316,7 @@ if __name__ == "__main__":
     dosja_projektit = Path(__file__).resolve().parent.parent
 
     # Ndryshoje këtë emër kur dëshiron të provosh një instancë tjetër.
-    emri_instancës = "grf7"
+    emri_instancës = "grf9"
 
     skedari_instancës = (
         dosja_projektit / "instances" / f"{emri_instancës}.txt"
@@ -376,7 +376,7 @@ if __name__ == "__main__":
 
     print("\nSimulated Annealing:")
 
-    for seed in range(1, 6):
+    for seed in range(2, 6):
         fillimi = time.perf_counter()
 
         rruga, kosto = simulated_annealing(
