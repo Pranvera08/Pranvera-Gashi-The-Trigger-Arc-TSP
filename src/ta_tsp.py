@@ -268,12 +268,21 @@ def simulated_annealing(n, harqet, marredheniet, iteracione=10000, seed=7):
 
 if __name__ == "__main__":
     dosja_projektit = Path(__file__).resolve().parent.parent
-    skedari_instancës = dosja_projektit / "instances" / "grf1.txt"
-    skedari_rezultateve = dosja_projektit / "results" / "results_template.csv"
+
+    # Ndryshoje këtë emër kur dëshiron të provosh një instancë tjetër
+    emri_instancës = "grf2"
+
+    skedari_instancës = (
+        dosja_projektit / "instances" / f"{emri_instancës}.txt"
+    )
+    skedari_rezultateve = (
+        dosja_projektit / "results" / "results_template.csv"
+    )
 
     # Lexojmë instancën
     n, harqet, marredheniet = lexo_instancen(skedari_instancës)
 
+    print("Instanca:", emri_instancës)
     print("Numri i nyjeve:", n)
     print("Numri i harqeve:", len(harqet))
     print("Numri i marrëdhënieve:", len(marredheniet))
@@ -298,24 +307,24 @@ if __name__ == "__main__":
 
     print("\nNdërtim me kthim pas:")
     print("Rruga:", rruga_fillestare)
-    print("Kostoja:", kosto_fillestare)
+    print(f"Kostoja: {kosto_fillestare:.2f}")
 
     rezultatet.append({
-        "instance": "grf1",
+        "instance": emri_instancës,
         "algorithm": "Backtracking construction",
         "seed": 0,
         "iterations": 0,
-        "cost": kosto_fillestare,
+        "cost": round(kosto_fillestare, 2),
         "seconds": "",
         "official_validator_valid": "not_checked",
     })
 
-    # Prova fillestare e Simulated Annealing: 100 iteracione, një seed
+    # Pesë prova të Simulated Annealing, me nga 10 000 iteracione
     iteracione = 10000
 
     print("\nSimulated Annealing:")
 
-    for seed in range(2, 6):
+    for seed in range(1, 6):
         fillimi = time.perf_counter()
 
         rruga, kosto = simulated_annealing(
@@ -330,15 +339,15 @@ if __name__ == "__main__":
 
         print(
             f"Seed {seed}: rruga={rruga}, "
-            f"kostoja={kosto}, koha={koha:.6f} sekonda"
+            f"kostoja={kosto:.2f}, koha={koha:.6f} sekonda"
         )
 
         rezultatet.append({
-            "instance": "grf1",
+            "instance": emri_instancës,
             "algorithm": "Simulated Annealing",
             "seed": seed,
             "iterations": iteracione,
-            "cost": kosto,
+            "cost": round(kosto, 2),
             "seconds": round(koha, 6),
             "official_validator_valid": "not_checked",
         })

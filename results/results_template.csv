@@ -21,3 +21,9 @@ grf1,Simulated Annealing,2,10000,111.77000000000001,11.043739,not_checked
 grf1,Simulated Annealing,3,10000,117.18000000000002,11.022068,not_checked
 grf1,Simulated Annealing,4,10000,113.41,10.864203,not_checked
 grf1,Simulated Annealing,5,10000,111.34000000000003,10.879109,not_checked
+grf2,Backtracking construction,0,0,65.8,,not_checked
+grf2,Simulated Annealing,1,10000,51.28,10.790711,not_checked
+grf2,Simulated Annealing,2,10000,49.88,10.972626,not_checked
+grf2,Simulated Annealing,3,10000,52.39,10.898019,not_checked
+grf2,Simulated Annealing,4,10000,53.63,10.834851,not_checked
+grf2,Simulated Annealing,5,10000,58.46,10.908603,not_checked
