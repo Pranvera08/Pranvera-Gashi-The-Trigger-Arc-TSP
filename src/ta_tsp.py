@@ -270,7 +270,7 @@ if __name__ == "__main__":
     dosja_projektit = Path(__file__).resolve().parent.parent
 
     # Ndryshoje këtë emër kur dëshiron të provosh një instancë tjetër
-    emri_instancës = "grf6"
+    emri_instancës = "grf7"
 
     skedari_instancës = (
         dosja_projektit / "instances" / f"{emri_instancës}.txt"
