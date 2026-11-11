@@ -40,3 +40,10 @@ grf4,Simulated Annealing,2,10000,54.17,100.324062,not_checked
 grf4,Simulated Annealing,3,10000,45.04,102.993718,not_checked
 grf4,Simulated Annealing,4,10000,45.35,106.803276,not_checked
 grf4,Simulated Annealing,5,10000,46.98,102.309812,not_checked
+grf5,Backtracking construction,0,0,128.1,,not_checked
+grf5,Simulated Annealing,1,10000,128.1,4.154543,not_checked
+grf5,Backtracking construction,0,0,128.1,,not_checked
+grf5,Simulated Annealing,2,10000,125.27,4.584464,not_checked
+grf5,Simulated Annealing,3,10000,126.01,4.095968,not_checked
+grf5,Simulated Annealing,4,10000,126.17,4.110284,not_checked
+grf5,Simulated Annealing,5,10000,125.4,4.04557,not_checked
