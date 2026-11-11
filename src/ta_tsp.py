@@ -84,38 +84,55 @@ def lexo_instancen(emri_skedarit):
     return n, harqet, marredheniet
 
 
-def llogarit_koston(n, harqet, marredheniet, rruga):
-    """Llogarit koston e rrugës duke zbatuar trigger-at sipas rendit."""
-
-    if len(rruga) != n + 1 or rruga[0] != 0 or rruga[-1] != 0:
-        raise ValueError(
-            "Rruga duhet të fillojë dhe të përfundojë te nyja 0 "
-            "dhe të ketë n + 1 nyje."
-        )
-
-    # Çdo nyje duhet të vizitohet saktësisht një herë
-    if set(rruga[:-1]) != set(range(n)) or len(set(rruga[:-1])) != n:
-        raise ValueError("Rruga nuk është cikël Hamiltonian.")
-
-    # Gjejmë identifikuesin e harkut nga nyja prej dhe nyja deri
+def pergatit_indekset(harqet, marredheniet):
+    """
+    Përgatit hartat e harqeve dhe trigger-ave.
+    Këto harta përgatiten një herë dhe ripërdoren gjatë kërkimit.
+    """
     harku_sipas_nyjeve = {}
+    triggerat_sipas_harkut = {}
 
     for id_harku, harku in harqet.items():
         harku_sipas_nyjeve[(harku.prej, harku.deri)] = id_harku
 
-    # Në fillim, secili hark e ka koston fillestare
-    kostot_aktuale = {
-        id_harku: harku.kosto
-        for id_harku, harku in harqet.items()
-    }
-
-    # Grupojmë marrëdhëniet sipas harkut trigger
-    triggerat_sipas_harkut = {}
-
     for marredhenia in marredheniet:
         id_trigger = marredhenia["trigger"]
-        triggerat_sipas_harkut.setdefault(id_trigger, []).append(marredhenia)
 
+        triggerat_sipas_harkut.setdefault(
+            id_trigger, []
+        ).append(marredhenia)
+
+    return harku_sipas_nyjeve, triggerat_sipas_harkut
+
+
+def llogarit_koston(
+    n,
+    harqet,
+    marredheniet,
+    rruga,
+    indekset=None,
+    kontrollo_rrugen=True,
+):
+    """Llogarit koston e rrugës duke zbatuar trigger-at sipas rendit."""
+
+    if kontrollo_rrugen:
+        if len(rruga) != n + 1 or rruga[0] != 0 or rruga[-1] != 0:
+            raise ValueError(
+                "Rruga duhet të fillojë dhe të përfundojë te nyja 0 "
+                "dhe të ketë n + 1 nyje."
+            )
+
+        # Çdo nyje duhet të vizitohet saktësisht një herë
+        if set(rruga[:-1]) != set(range(n)) or len(set(rruga[:-1])) != n:
+            raise ValueError("Rruga nuk është cikël Hamiltonian.")
+
+    if indekset is None:
+        indekset = pergatit_indekset(harqet, marredheniet)
+
+    harku_sipas_nyjeve, triggerat_sipas_harkut = indekset
+
+    # Ruajmë vetëm kostot që ndryshojnë nga trigger-at.
+    kostot_e_ndryshuara = {}
     harqet_e_kaluara = set()
     kosto_totale = 0.0
 
@@ -128,19 +145,22 @@ def llogarit_koston(n, harqet, marredheniet, rruga):
                 f"Nuk ekziston harku nga nyja {prej} te nyja {deri}."
             )
 
-        # Shtojmë koston aktuale të harkut
-        kosto_totale += kostot_aktuale[id_harku]
+        # Përdorim koston e ndryshuar, ose koston fillestare të harkut.
+        kosto_totale += kostot_e_ndryshuara.get(
+            id_harku,
+            harqet[id_harku].kosto,
+        )
 
-        # Shënojmë se ky hark u përdor
         harqet_e_kaluara.add(id_harku)
 
-        # Aktivizojmë trigger-at e këtij harku
+        # Aktivizojmë marrëdhëniet trigger të këtij harku.
         for marredhenia in triggerat_sipas_harkut.get(id_harku, []):
             id_objektiv = marredhenia["objektiv"]
 
-            # Ndryshojmë koston vetëm nëse harku objektiv nuk është kaluar
+            # Trigger-i nuk e ndryshon koston nëse harku objektiv
+            # është kaluar më herët.
             if id_objektiv not in harqet_e_kaluara:
-                kostot_aktuale[id_objektiv] = marredhenia["kosto_re"]
+                kostot_e_ndryshuara[id_objektiv] = marredhenia["kosto_re"]
 
     return kosto_totale
 
@@ -204,13 +224,32 @@ def nderto_rruge_fillestare(n, harqet):
     return rruga
 
 
-def simulated_annealing(n, harqet, marredheniet, iteracione=10000, seed=7):
+def simulated_annealing(
+    n,
+    harqet,
+    marredheniet,
+    iteracione=10000,
+    seed=7,
+    rruga_fillestare=None,
+    indekset=None,
+):
     """Përpiqet ta përmirësojë rrugën fillestare."""
     gjeneratori = random.Random(seed)
 
-    rruga_aktuale = nderto_rruge_fillestare(n, harqet)
+    if indekset is None:
+        indekset = pergatit_indekset(harqet, marredheniet)
+
+    if rruga_fillestare is None:
+        rruga_fillestare = nderto_rruge_fillestare(n, harqet)
+
+    rruga_aktuale = rruga_fillestare[:]
+
     kosto_aktuale = llogarit_koston(
-        n, harqet, marredheniet, rruga_aktuale
+        n,
+        harqet,
+        marredheniet,
+        rruga_aktuale,
+        indekset=indekset,
     )
 
     rruga_me_e_mire = rruga_aktuale[:]
@@ -225,7 +264,7 @@ def simulated_annealing(n, harqet, marredheniet, iteracione=10000, seed=7):
 
         rruga_kandidate = rruga_aktuale[:]
 
-        # Zgjedhim dy pozita brenda rrugës dhe i ndryshojmë
+        # Zgjedhim dy pozita brenda rrugës dhe i ndryshojmë.
         pozita_1, pozita_2 = sorted(
             gjeneratori.sample(range(1, n), 2)
         )
@@ -241,8 +280,15 @@ def simulated_annealing(n, harqet, marredheniet, iteracione=10000, seed=7):
             )
 
         try:
+            # Ndërrimi dhe përmbysja ruajnë nyjet e ciklit Hamiltonian.
+            # Prandaj nuk e përsërisim kontrollin e plotë në çdo iteracion.
             kosto_kandidate = llogarit_koston(
-                n, harqet, marredheniet, rruga_kandidate
+                n,
+                harqet,
+                marredheniet,
+                rruga_kandidate,
+                indekset=indekset,
+                kontrollo_rrugen=False,
             )
         except ValueError:
             temperatura *= ftohja
@@ -250,7 +296,7 @@ def simulated_annealing(n, harqet, marredheniet, iteracione=10000, seed=7):
 
         ndryshimi = kosto_kandidate - kosto_aktuale
 
-        # Pranojmë përmirësimet dhe nganjëherë edhe zgjidhje më të kushtueshme
+        # Pranojmë përmirësimet dhe nganjëherë edhe zgjidhje më të kushtueshme.
         if ndryshimi < 0 or gjeneratori.random() < math.exp(
             -ndryshimi / max(temperatura, 0.000001)
         ):
@@ -269,7 +315,7 @@ def simulated_annealing(n, harqet, marredheniet, iteracione=10000, seed=7):
 if __name__ == "__main__":
     dosja_projektit = Path(__file__).resolve().parent.parent
 
-    # Ndryshoje këtë emër kur dëshiron të provosh një instancë tjetër
+    # Ndryshoje këtë emër kur dëshiron të provosh një instancë tjetër.
     emri_instancës = "grf7"
 
     skedari_instancës = (
@@ -279,8 +325,9 @@ if __name__ == "__main__":
         dosja_projektit / "results" / "results_template.csv"
     )
 
-    # Lexojmë instancën
+    # Lexojmë instancën dhe përgatitim indekset një herë.
     n, harqet, marredheniet = lexo_instancen(skedari_instancës)
+    indekset = pergatit_indekset(harqet, marredheniet)
 
     print("Instanca:", emri_instancës)
     print("Numri i nyjeve:", n)
@@ -299,10 +346,15 @@ if __name__ == "__main__":
 
     rezultatet = []
 
-    # Gjejmë një rrugë fillestare me kërkim dhe kthim pas
+    # Gjejmë një rrugë fillestare me kërkim dhe kthim pas.
     rruga_fillestare = nderto_rruge_fillestare(n, harqet)
+
     kosto_fillestare = llogarit_koston(
-        n, harqet, marredheniet, rruga_fillestare
+        n,
+        harqet,
+        marredheniet,
+        rruga_fillestare,
+        indekset=indekset,
     )
 
     print("\nNdërtim me kthim pas:")
@@ -319,7 +371,7 @@ if __name__ == "__main__":
         "official_validator_valid": "not_checked",
     })
 
-    # Pesë prova të Simulated Annealing, me nga 10 000 iteracione
+    # Pesë prova të Simulated Annealing, me nga 10 000 iteracione.
     iteracione = 10000
 
     print("\nSimulated Annealing:")
@@ -333,6 +385,8 @@ if __name__ == "__main__":
             marredheniet,
             iteracione=iteracione,
             seed=seed,
+            rruga_fillestare=rruga_fillestare,
+            indekset=indekset,
         )
 
         koha = time.perf_counter() - fillimi
@@ -352,7 +406,7 @@ if __name__ == "__main__":
             "official_validator_valid": "not_checked",
         })
 
-    # Shtojmë rezultatet në skedarin CSV
+    # Shtojmë rezultatet në skedarin CSV.
     ka_te_dhena = (
         skedari_rezultateve.exists()
         and skedari_rezultateve.stat().st_size > 0
