@@ -8,7 +8,7 @@ grf6,20,200,1732,81.75,49.93,38.92,Simulated Annealing (insertion+swap),1,500000
 grf7,40,1200,47777,231.02,193.95,16.05,Simulated Annealing (insertion+swap),2,500000,22.187891,not_checked,not_checked_officially
 grf8,40,1200,47281,73.62,55.83,24.16,Simulated Annealing (insertion+swap),2,500000,26.852917,not_checked,not_checked_officially
 grf9,40,1200,909054,227.90,189.24,16.96,Simulated Annealing (insertion+swap),2,500000,9.771695,not_checked,not_checked_officially
-grf10,40,1200,881876,,,,,,,,,not_run_with_optimized_code
+grf10,40,1200,881876,78.14,56.75,27.37,Simulated Annealing (insertion+swap),2,500000,9.61017,not_checked,not_checked_officially
 grf11,40,800,15490,,,,,,,,,not_run_with_optimized_code
 grf12,40,800,15650,,,,,,,,,not_run_with_optimized_code
 grf13,60,2700,162514,,,,,,,,,not_run_with_optimized_code
