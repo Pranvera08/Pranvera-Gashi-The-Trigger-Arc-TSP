@@ -14,7 +14,7 @@ grf12,40,800,15650,73.80,63.92,13.39,Simulated Annealing (insertion+swap),3,5000
 grf13,60,2700,162514,325.41,295.75,9.11,Simulated Annealing (insertion+swap),5,500000,41.784567,not_checked,not_checked_officially
 grf14,60,2700,160095,91.95,63.81,30.60,Simulated Annealing (insertion+swap),3,500000,44.906909,not_checked,not_checked_officially
 grf15,60,2700,4527944,322.37,283.88,11.94,Simulated Annealing (insertion+swap),3,500000,14.308126,not_checked,not_checked_officially
-grf16,60,2700,4478927,,,,,,,,,not_run_with_optimized_code
+grf16,60,2700,4478927,97.51,70.03,28.18,Simulated Annealing (insertion+swap),3,500000,15.115744,not_checked,not_checked_officially
 grf17,60,1800,53313,,,,,,,,,not_run_with_optimized_code
 grf18,60,1800,53472,,,,,,,,,not_run_with_optimized_code
 grf19,20,300,5708,,,,,,,,,not_run_with_optimized_code
