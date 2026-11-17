@@ -47,3 +47,10 @@ grf8,Simulated Annealing (insertion+swap),2,500000,55.83,26.852917,not_checked
 grf8,Simulated Annealing (insertion+swap),3,500000,56.27,26.823608,not_checked
 grf8,Simulated Annealing (insertion+swap),4,500000,59.08,25.872002,not_checked
 grf8,Simulated Annealing (insertion+swap),5,500000,56.28,25.233234,not_checked
+grf9,Backtracking construction,0,0,227.9,0.000715,not_checked
+grf9,Simulated Annealing (insertion+swap),1,500000,192.96,9.530831,not_checked
+grf9,Simulated Annealing (insertion+swap),2,500000,189.24,9.771695,not_checked
+grf9,Simulated Annealing (insertion+swap),3,500000,192.65,9.76211,not_checked
+grf9,Simulated Annealing (insertion+swap),4,500000,192.56,9.685973,not_checked
+grf9,Simulated Annealing (insertion+swap),5,500000,192.12,9.558401,not_checked
+
