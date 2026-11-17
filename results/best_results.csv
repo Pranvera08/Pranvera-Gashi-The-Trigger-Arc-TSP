@@ -2,7 +2,7 @@ instance,nodes,arcs,trigger_relationships,baseline_cost,best_cost,improvement_pe
 grf1,20,300,5651,123.44,101.13,18.07,Simulated Annealing (insertion+swap),5,500000,8.725506,not_checked,not_checked_officially
 grf2,20,300,5708,65.80,44.53,32.33,Simulated Annealing (insertion+swap),1,500000,10.171424,not_checked,not_checked_officially
 grf3,20,300,55306,112.38,98.35,12.48,Simulated Annealing (insertion+swap),3,500000,5.718545,not_checked,not_checked_officially
-grf4,20,300,58208,,,,,,,,,not_run_with_optimized_code
+grf4,20,300,58208,60.17,38.59,35.87,Simulated Annealing (insertion+swap),1,500000,5.91389,not_checked,not_checked_officially
 grf5,20,200,1880,,,,,,,,,not_run_with_optimized_code
 grf6,20,200,1732,,,,,,,,,not_run_with_optimized_code
 grf7,40,1200,47777,,,,,,,,,not_run_with_optimized_code
