@@ -1,0 +1,7 @@
+instance,algorithm,seed,iterations,cost,seconds,official_validator_valid
+grf1,Backtracking construction,0,0,123.44,0.000237,not_checked
+grf1,Simulated Annealing (insertion+swap),1,500000,101.34,9.050596,not_checked
+grf1,Simulated Annealing (insertion+swap),2,500000,102.26,8.959472,not_checked
+grf1,Simulated Annealing (insertion+swap),3,500000,101.92,9.019976,not_checked
+grf1,Simulated Annealing (insertion+swap),4,500000,103.51,9.066202,not_checked
+grf1,Simulated Annealing (insertion+swap),5,500000,101.13,8.725506,not_checked

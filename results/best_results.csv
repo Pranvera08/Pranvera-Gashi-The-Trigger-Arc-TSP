@@ -1,0 +1,22 @@
+instance,nodes,arcs,trigger_relationships,baseline_cost,best_cost,improvement_percent,best_algorithm,best_seed,iterations,seconds,official_validator_valid,status
+grf1,20,300,5651,123.44,101.13,18.07,Simulated Annealing (insertion+swap),5,500000,8.725506,not_checked,not_checked_officially
+grf2,20,300,5708,,,,,,,,,not_run_with_optimized_code
+grf3,20,300,55306,,,,,,,,,not_run_with_optimized_code
+grf4,20,300,58208,,,,,,,,,not_run_with_optimized_code
+grf5,20,200,1880,,,,,,,,,not_run_with_optimized_code
+grf6,20,200,1732,,,,,,,,,not_run_with_optimized_code
+grf7,40,1200,47777,,,,,,,,,not_run_with_optimized_code
+grf8,40,1200,47281,,,,,,,,,not_run_with_optimized_code
+grf9,40,1200,909054,,,,,,,,,not_run_with_optimized_code
+grf10,40,1200,881876,,,,,,,,,not_run_with_optimized_code
+grf11,40,800,15490,,,,,,,,,not_run_with_optimized_code
+grf12,40,800,15650,,,,,,,,,not_run_with_optimized_code
+grf13,60,2700,162514,,,,,,,,,not_run_with_optimized_code
+grf14,60,2700,160095,,,,,,,,,not_run_with_optimized_code
+grf15,60,2700,4527944,,,,,,,,,not_run_with_optimized_code
+grf16,60,2700,4478927,,,,,,,,,not_run_with_optimized_code
+grf17,60,1800,53313,,,,,,,,,not_run_with_optimized_code
+grf18,60,1800,53472,,,,,,,,,not_run_with_optimized_code
+grf19,20,300,5708,,,,,,,,,not_run_with_optimized_code
+grf20,40,1200,47281,,,,,,,,,not_run_with_optimized_code
+grf21,60,2700,160095,,,,,,,,,not_run_with_optimized_code
