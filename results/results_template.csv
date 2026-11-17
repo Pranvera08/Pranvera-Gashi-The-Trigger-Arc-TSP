@@ -5,7 +5,6 @@ demo,Simulated Annealing,2,10000,27,0.138609,N/A - instancë demonstrative
 demo,Simulated Annealing,3,10000,27,0.136271,N/A - instancë demonstrative
 demo,Simulated Annealing,4,10000,27,0.140535,N/A - instancë demonstrative
 demo,Simulated Annealing,5,10000,27,0.129375,N/A - instancë demonstrative
-
 grf1,Backtracking construction,0,0,123.44,,not_checked
 grf1,Simulated Annealing,1,100,123.44,0.125799,not_checked
 grf1,Backtracking construction,0,0,123.44,,not_checked
@@ -138,3 +137,9 @@ grf17,Simulated Annealing,2,10000,340.04,2.159931,not_checked
 grf17,Simulated Annealing,3,10000,340.04,2.331643,not_checked
 grf17,Simulated Annealing,4,10000,339.58,2.20045,not_checked
 grf17,Simulated Annealing,5,10000,340.04,2.393384,not_checked
+grf18,Backtracking construction,0,0,128.69,,not_checked
+grf18,Simulated Annealing,1,10000,128.69,2.341137,not_checked
+grf18,Simulated Annealing,2,10000,128.69,2.477962,not_checked
+grf18,Simulated Annealing,3,10000,128.69,2.363005,not_checked
+grf18,Simulated Annealing,4,10000,128.69,2.51144,not_checked
+grf18,Simulated Annealing,5,10000,128.69,2.234709,not_checked

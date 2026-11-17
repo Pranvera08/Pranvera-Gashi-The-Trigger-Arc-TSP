@@ -1,3 +1,4 @@
 instances/grf15*
 instances/grf16*
 .idea/
+__pycache__/
