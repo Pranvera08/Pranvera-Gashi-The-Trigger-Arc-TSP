@@ -1,0 +1,22 @@
+instance,nodes,arcs,trigger_relationships,baseline_cost,best_cost,improvement_percent,best_algorithm,best_seed,iterations,seconds,official_validator_valid,status
+grf1,20,300,5651,123.44,101.13,18.07,Simulated Annealing (insertion+swap),5,500000,8.725506,not_checked,not_checked_officially
+grf2,20,300,5708,65.80,44.53,32.33,Simulated Annealing (insertion+swap),1,500000,10.171424,not_checked,not_checked_officially
+grf3,20,300,55306,112.38,98.35,12.48,Simulated Annealing (insertion+swap),3,500000,5.718545,not_checked,not_checked_officially
+grf4,20,300,58208,60.17,38.59,35.87,Simulated Annealing (insertion+swap),1,500000,5.91389,not_checked,not_checked_officially
+grf5,20,200,1880,128.10,113.17,11.65,Simulated Annealing (insertion+swap),3,500000,4.025525,not_checked,not_checked_officially
+grf6,20,200,1732,81.75,49.93,38.92,Simulated Annealing (insertion+swap),1,500000,4.215596,not_checked,not_checked_officially
+grf7,40,1200,47777,231.02,193.95,16.05,Simulated Annealing (insertion+swap),2,500000,22.187891,not_checked,not_checked_officially
+grf8,40,1200,47281,73.62,55.83,24.16,Simulated Annealing (insertion+swap),2,500000,26.852917,not_checked,not_checked_officially
+grf9,40,1200,909054,227.90,189.24,16.96,Simulated Annealing (insertion+swap),2,500000,9.771695,not_checked,not_checked_officially
+grf10,40,1200,881876,78.14,56.75,27.37,Simulated Annealing (insertion+swap),2,500000,9.61017,not_checked,not_checked_officially
+grf11,40,800,15490,223.67,212.64,4.93,Simulated Annealing (insertion+swap),2,500000,7.963141,not_checked,not_checked_officially
+grf12,40,800,15650,73.80,63.92,13.39,Simulated Annealing (insertion+swap),3,500000,8.61246,not_checked,not_checked_officially
+grf13,60,2700,162514,325.41,295.75,9.11,Simulated Annealing (insertion+swap),5,500000,41.784567,not_checked,not_checked_officially
+grf14,60,2700,160095,91.95,63.81,30.60,Simulated Annealing (insertion+swap),3,500000,44.906909,not_checked,not_checked_officially
+grf15,60,2700,4527944,322.37,283.88,11.94,Simulated Annealing (insertion+swap),3,500000,14.308126,not_checked,not_checked_officially
+grf16,60,2700,4478927,97.51,70.03,28.18,Simulated Annealing (insertion+swap),3,500000,15.115744,not_checked,not_checked_officially
+grf17,60,1800,53313,340.04,303.24,10.82,Simulated Annealing (insertion+swap),3,500000,16.417234,not_checked,not_checked_officially
+grf18,60,1800,53472,128.69,87.12,32.30,Simulated Annealing (insertion+swap),3,500000,24.161483,not_checked,not_checked_officially
+grf19,20,300,5708,65.80,44.53,32.33,Simulated Annealing (insertion+swap),1,500000,11.910876,not_checked,not_checked_officially
+grf20,40,1200,47281,73.62,55.83,24.16,Simulated Annealing (insertion+swap),2,500000,30.484999,not_checked,not_checked_officially
+grf21,60,2700,160095,91.95,63.81,30.60,Simulated Annealing (insertion+swap),3,484201,60.01301,not_checked,not_checked_officially
