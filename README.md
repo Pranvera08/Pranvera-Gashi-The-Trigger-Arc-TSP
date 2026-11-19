@@ -26,11 +26,12 @@ Zgjidhja fillestare për SA dhe ILS ndërtohet me backtracking (`src/ndertimi.py
 - `src/levizjet.py`: lëvizjet insertion/swap, perturbimi dhe kërkimi lokal
 - `src/ndertimi.py`: backtracking dhe ndërtimi i GRASP
 - `src/sa.py`, `src/grasp.py`, `src/ils.py`: algoritmet
-- `instances/`: instancat (`grf15.txt` dhe `grf16.txt` janë shumë të mëdha dhe nuk ruhen në Git)
+- `instances/`: instancat (`grf15.txt` dhe `grf16.txt` janë shumë të mëdha dhe nuk ruhen në Git; `grf19`–`grf21` janë kopje të `grf2`, `grf8`, `grf14`)
 - `results/<algoritmi>/`: rezultatet për secilin algoritëm veç e veç (shih më poshtë)
 - `results/krahasimi.csv`: krahasimi i tre algoritmeve për çdo instancë
 - `results/sa_v1/`: rezultatet e versionit të parë (kodi i tij gjendet në historinë e Git-it)
-- `notebooks/`: analizë dhe grafikë
+- `notebooks/Trigger_Arc_TSP_Kaggle.ipynb`: e ekzekuton `main.py` në Kaggle dhe i analizon rezultatet (tabela dhe grafikë)
+- `REPORT.md`: raporti i projektit
 
 ## Si ekzekutohet
 
@@ -46,6 +47,26 @@ python src/main.py grf1 --seeds 1 2 3 --koha 10 --procese 4
 - `--koha`: sekonda për çdo provë (seed); të gjitha algoritmet marrin kohë të barabartë
 - `--seeds`: cilat seed-e (parazgjedhje 1 2 3 4 5)
 - `--procese`: sa prova ekzekutohen paralelisht (parazgjedhje: numri i bërthamave)
+
+## Ekzekutimi në Kaggle
+
+Rezultatet përfundimtare janë marrë në Kaggle (CPU me 4 bërthama), me notebook-un `notebooks/Trigger_Arc_TSP_Kaggle.ipynb`:
+
+1. *Create → New Notebook → File → Import Notebook* dhe zgjidh notebook-un.
+2. *Settings → Internet: On*, që projekti të klonohet nga GitHub-i.
+3. `grf15.txt` dhe `grf16.txt` shtohen si Dataset me *Add Input*.
+4. *Save Version → Save & Run All*; rezultatet shkarkohen nga *Output* si `rezultatet.zip`.
+
+Notebook-u në Kaggle: [linku i notebook-ut publik]
+
+## Përmbledhja e rezultateve
+
+21 instanca × 3 algoritme × 5 seed-e, 60 s për provë (shih `REPORT.md` për detajet):
+
+| | SA | GRASP | ILS |
+|---|---:|---:|---:|
+| Fitore sipas mesatares (18 instanca unike) | 0 | 1 | **11** |
+| Gap-i mesatar ndaj më të mirës së njohur | 2.18% | 1.35% | **0.69%** |
 
 ## Rezultatet
 
