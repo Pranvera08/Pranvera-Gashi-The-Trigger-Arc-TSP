@@ -27,7 +27,7 @@ Zgjidhja fillestare për SA dhe ILS ndërtohet me backtracking (`src/ndertimi.py
 - `src/ndertimi.py`: backtracking dhe ndërtimi i GRASP
 - `src/sa.py`, `src/grasp.py`, `src/ils.py`: algoritmet
 - `src/permireso.py`: post-optimizimi (ILS nga zgjidhja më e mirë e njohur)
-- `instances/`: instancat (`grf15.txt` dhe `grf16.txt` janë shumë të mëdha dhe nuk ruhen në Git; `grf19`–`grf21` janë kopje të `grf2`, `grf8`, `grf14`)
+- `instances/`: instancat e konkursit MESS 2024: grupi i parë `grf1`–`grf21` (`grf15.txt` dhe `grf16.txt` janë shumë të mëdha dhe nuk ruhen në Git; `grf19`–`grf21` janë kopje të `grf2`, `grf8`, `grf14`) dhe grupi i dytë `grf101`–`grf134`
 - `results/<algoritmi>/`: rezultatet për secilin algoritëm veç e veç (shih më poshtë)
 - `results/krahasimi.csv`: krahasimi i tre algoritmeve për çdo instancë
 - `results/me_te_mirat_e_njohura/`: rekordet e post-optimizimit
@@ -73,12 +73,13 @@ Notebook-u në Kaggle: [linku i notebook-ut publik]
 
 ## Përmbledhja e rezultateve
 
-21 instanca × 3 algoritme × 5 seed-e, 60 s për provë (shih `REPORT.md` për detajet):
+55 instanca (21 të grupit të parë + 34 të grupit të dytë) × 3 algoritme × 5 seed-e, 60 s për provë (shih `REPORT.md` për detajet):
 
 | | SA | GRASP | ILS |
 |---|---:|---:|---:|
-| Fitore sipas mesatares (18 instanca unike) | 0 | 1 | **11** |
-| Gap-i mesatar ndaj më të mirës së njohur | 2.18% | 1.35% | **0.69%** |
+| Fitore sipas mesatares (52 instanca unike) | 2 | 9 | **34** |
+| Gap-i mesatar ndaj më të mirës së njohur | 1.40% | **0.62%** | 0.68% |
+| Gap-i mediane | 0.44% | 0.28% | **0.13%** |
 
 ## Rezultatet
 

@@ -10,9 +10,9 @@
 
 Ky projekt trajton Trigger Arc Travelling Salesman Problem (TA-TSP). Është një variant i problemit të shitësit udhëtues, ku kalimi nëpër një hark mund ta ndryshojë koston e një harku tjetër që kalohet më vonë. Problemi është paraqitur në konkursin MESS 2024 (Catania).
 
-U implementuan në Python tre algoritme metaheuristike: **Simulated Annealing (SA)**, **GRASP** dhe **Iterated Local Search (ILS)**. Ato ndajnë të njëjtin funksion të kostos, të njëjtat lëvizje dhe të njëjtin kërkim lokal. Çdo algoritëm u ekzekutua në të 21 instancat e publikuara, me 5 seed-e dhe 60 sekonda për provë, në të njëjtin kompjuter (Kaggle, 4 bërthama CPU).
+U implementuan në Python tre algoritme metaheuristike: **Simulated Annealing (SA)**, **GRASP** dhe **Iterated Local Search (ILS)**. Ato ndajnë të njëjtin funksion të kostos, të njëjtat lëvizje dhe të njëjtin kërkim lokal. Algoritmet u testuan në të dy grupet e instancave të konkursit: **21 instanca të grupit të parë** (grafe të dendura, 20–60 nyje) dhe **34 instanca të grupit të dytë** (grafe të rralla, 18–142 nyje), gjithsej 55 instanca. Çdo algoritëm u ekzekutua me 5 seed-e dhe 60 sekonda për provë, në Kaggle (4 bërthama CPU), gjithsej 825 prova.
 
-Rezultati kryesor: **ILS ishte algoritmi më i mirë**. Ai pati mesataren më të ulët në 11 nga 18 instancat unike, gap-in mesatar më të vogël ndaj zgjidhjes më të mirë të njohur (0.69%, kundrejt 1.35% të GRASP-it dhe 2.18% të SA-së) dhe arriti zgjidhjen më të mirë në 52% të provave. GRASP-i ishte i dyti dhe i vetmi që fitoi në instancën më të madhe, `grf15`. Krahasuar me versionin e parë të projektit (vetëm SA), kostoja më e mirë u përmirësua në 11 nga 18 instancat, deri në 6.26%.
+Rezultati kryesor: **ILS ishte algoritmi më i mirë në përgjithësi**. Ai pati mesataren më të ulët në 34 nga 52 instancat unike (11 nga 18 në grupin e parë dhe 23 nga 34 në të dytin) dhe arriti zgjidhjen më të mirë në 34% të provave. **GRASP-i ishte më i qëndrueshmi**, sidomos në grafet e rralla, ku gap-i i tij nuk e kaloi kurrë 0.64%. SA-ja ishte e treta. Për grafet e rralla të grupit të dytë u zhvillua një ndërtim i ri i zgjidhjes fillestare (rregulli i Warnsdorff-it me prerje), pa të cilin metoda e parë nuk gjente cikël në 31 nga 34 instancat. Krahasuar me versionin e parë të projektit (vetëm SA), kostoja më e mirë u përmirësua në 11 nga 18 instancat e grupit të parë, deri në 6.26%. Me post-optimizim (ILS i nisur nga zgjidhja më e mirë e njohur), rekordet u përmirësuan edhe në 25 instanca, deri në 2.27%.
 
 ## 1. Përshkrimi i problemit
 
@@ -47,13 +47,20 @@ Dy optimizime e bëjnë vlerësimin më të shpejtë gjatë kërkimit:
 1. **Vlerësim i pjesshëm.** Nëse rruga kandidate ndryshon vetëm nga harku s e tutje, harqet 0 … s−1 kanë të njëjtët paraardhës, pra edhe të njëjtën kosto. Ruhet shuma e tyre (prefiksi) dhe rillogariten vetëm harqet nga s e tutje.
 2. **Ndërprerje e hershme.** Të gjitha kostot në instanca janë ≥ 0, prandaj shuma vetëm rritet. Sapo shuma e pjesshme e kalon kufirin (kostoja aktuale te kërkimi lokal, ose pragu i pranimit te SA), kandidati refuzohet pa e mbaruar llogaritjen.
 
-Çdo zgjidhje përfundimtare kontrollohet me një vlerësim të plotë: cikël Hamiltonian, harqe që ekzistojnë, kosto e rillogaritur. Pas eksperimenteve, zgjidhjet u verifikuan edhe me një vlerësues të pavarur me qasje tjetër (fjalor i trigger-ave aktivë gjatë kalimit). Të 57 zgjidhjet e kontrollueshme përputhen saktësisht. `grf15`/`grf16` nuk janë në repo, prandaj atyre iu kontrollua vetëm vlefshmëria e ciklit.
+Çdo zgjidhje përfundimtare kontrollohet me një vlerësim të plotë: cikël Hamiltonian, harqe që ekzistojnë, kosto e rillogaritur. Pas eksperimenteve, zgjidhjet u verifikuan edhe me një vlerësues të pavarur me qasje tjetër (fjalor i trigger-ave aktivë gjatë kalimit). Të 159 zgjidhjet e algoritmeve dhe 53 rekordet e post-optimizimit që mund të kontrollohen përputhen saktësisht. `grf15`/`grf16` nuk janë në repo, prandaj atyre iu kontrollua vetëm vlefshmëria e ciklit.
 
 ## 4. Algoritmet
 
 ### 4.1 Ndërtimi fillestar me kthim pas (backtracking)
 
 Ndërtimi nis te nyja 0 dhe në çdo hap provon fillimisht harqet me kosto bazë më të ulët. Nëse rruga ngec (nuk ka vazhdim ose kthim te 0), algoritmi kthehet prapa dhe provon harkun tjetër. Implementimi është me stivë (pa rekursion) dhe ka kufi prej 1 000 000 hapash. Kjo rrugë është pika e nisjes për SA dhe ILS.
+
+**Grafet e rralla (grupi i dytë).** Në grafet ku çdo nyje ka vetëm 5–11 harqe dalëse, ky kërkim nuk gjeti cikël në 31 nga 34 instancat. Prandaj, kur metoda e parë dështon, përdoret një kërkim i dytë me dy përmirësime:
+
+1. **Rregulli i Warnsdorff-it:** fillimisht provohet fqinji me më pak vazhdime të lira, me koston bazë si kriter të dytë. Nyjet "e vështira" vizitohen sa kanë ende rrugë.
+2. **Prerja:** një degë braktiset menjëherë nëse ndonjë nyje e pavizituar nuk ka më asnjë hyrje ose dalje të mundshme, ose nëse nuk ka mbetur asnjë nyje e pavizituar me hark kthimi te 0.
+
+Me këtë kërkim u gjet cikël në të 55 instancat, për më pak se 0.5 s. Për grupin e parë rruga fillestare mbetet e njëjtë, sepse kërkimi i dytë përdoret vetëm kur i pari dështon.
 
 ### 4.2 Lëvizjet dhe kërkimi lokal
 
@@ -80,6 +87,8 @@ GRASP (Greedy Randomized Adaptive Search Procedure) përsërit dy faza sa ka koh
 
 Iteracionet janë të pavarura nga njëra-tjetra, dhe ruhet zgjidhja më e mirë.
 
+**Në grafe të rralla** ndërtimi greedy i rastësishëm ngec pothuajse gjithmonë: te instancat me 58+ nyje të grupit të dytë nuk u ndërtua asnjë rrugë e vlefshme. Prandaj, nëse ndërtimi dështon 200 herë rresht pa asnjë sukses, GRASP-i kalon në një ndërtim me kthim pas të kufizuar dhe me prerjen e mësipërme. RCL-ja sipas kostos ndërtohet brenda fqinjëve me shkallë minimale të Warnsdorff-it (ose +1), kështu që zgjedhja mbetet greedy e rastësishme, por shmang rrugët pa dalje. Me këtë ndërtim, mbi 90% e ndërtimeve kanë sukses edhe te `grf134` (142 nyje).
+
 ### 4.5 Iterated Local Search (ILS)
 
 1. Nga rruga e backtracking-ut bëhet kërkim lokal me lagjen e plotë (segmente të çfarëdo gjatësie).
@@ -99,14 +108,20 @@ Shënimet: n = numri i nyjeve, m = numri i harqeve, r = numri i marrëdhënieve 
 | Ndërtimi i GRASP-it | O(n² · Δ) | O(n) |
 | Një kalim i kërkimit lokal | O(n² · L) lëvizje × O(n²) = O(n⁴ · L) | O(n) |
 | Backtracking | eksponenciale në rastin më të keq (e kufizuar në 10⁶ hapa) | O(n) |
+| Kontrolli i prerjes (Warnsdorff) për një hap | O(n · Δ) | O(n) |
+| Ndërtimi me Warnsdorff dhe prerje | O(K · n · Δ) për K hapa kërkimi | O(n) |
 
-Vlerësimi është O(n²) sepse për çdo hark kërkohet prapa nëpër prefiks. Në praktikë është shumë më i shpejtë: kërkimi ndalet te trigger-i i parë që gjendet, vlerësimi i pjesshëm i kapërcen harqet e pandryshuara, dhe ndërprerja e hershme i hedh kandidatët e këqij. Tabela O(m²) është e përballueshme për instancat e konkursit (m ≤ 2 700, rreth 58 MB) dhe jep qasje O(1) në marrëdhënie.
+Vlerësimi është O(n²) sepse për çdo hark kërkohet prapa nëpër prefiks. Në praktikë është shumë më i shpejtë: kërkimi ndalet te trigger-i i parë që gjendet, vlerësimi i pjesshëm i kapërcen harqet e pandryshuara, dhe ndërprerja e hershme i hedh kandidatët e këqij. Tabela O(m²) është e përballueshme për instancat e konkursit (m ≤ 2 700 në grupin e parë dhe m ≤ 1 562 në të dytin, rreth 58 MB në rastin më të madh) dhe jep qasje O(1) në marrëdhënie.
 
 Kostoja e lartë e një kalimi të kërkimit lokal shpjegon pse GRASP-i dhe ILS-i bëjnë shumë më pak iteracione se SA-ja (seksioni 6.4), por secili iteracion i tyre është shumë më "i zgjuar".
 
 ## 6. Eksperimentet dhe rezultatet
 
 ### 6.1 Instancat
+
+Instancat janë marrë nga faqja e konkursit MESS 2024 (faqja *Info*), ku publikohen në dy grupe.
+
+**Grupi i parë (21 instanca, grafe të dendura):**
 
 | Instanca | Nyje | Harqe | Marrëdhënie trigger | Kopje e |
 |---|---:|---:|---:|---|
@@ -134,15 +149,17 @@ Kostoja e lartë e një kalimi të kërkimit lokal shpjegon pse GRASP-i dhe ILS-
 
 `grf19`, `grf20` dhe `grf21` janë kopje identike (bajt për bajt) të `grf2`, `grf8` dhe `grf14`. U ekzekutuan për plotësi, por në statistikat përmbledhëse (fitore, gap) numërohen vetëm **18 instancat unike** `grf1`–`grf18`.
 
+**Grupi i dytë (34 instanca, grafe të rralla):** `grf101`–`grf134`, me 18–142 nyje, 90–1 562 harqe dhe deri në 208 020 marrëdhënie trigger. Çdo nyje ka vetëm 5–11 harqe dalëse, ndërsa në grupin e parë ka 10–45. Asnjë instancë e grupit të dytë nuk është kopje. Madhësitë e secilës janë në tabelën e seksionit 6.4.
+
 ### 6.2 Kushtet e eksperimentit
 
-- **Kompjuteri:** Kaggle Notebook, CPU me 4 bërthama. Të gjitha provat u bënë në të njëjtin ekzekutim, që krahasimi të jetë i drejtë.
+- **Kompjuteri:** Kaggle Notebook, CPU me 4 bërthama, i njëjti lloj për të dy grupet. Grupi i parë u ekzekutua në një version të notebook-ut dhe grupi i dytë në një tjetër, me të njëjtat parametra.
 - **Koha:** **60 sekonda** për çdo provë, e njëjtë për të tria algoritmet. Kufiri është kohor, jo me numër iteracionesh.
 - **Seed-et:** 1, 2, 3, 4, 5 për çdo algoritëm dhe instancë.
-- **Gjithsej:** 21 instanca × 3 algoritme × 5 seed-e = **315 prova**, 4 paralelisht.
-- **Ekzekutimi:** `python src/main.py te_gjitha --koha 60 --procese 4`, nga notebook-u në Kaggle.
+- **Gjithsej:** (21 + 34) instanca × 3 algoritme × 5 seed-e = **825 prova**, 4 paralelisht.
+- **Ekzekutimi:** `python src/main.py <instancat> --koha 60 --procese 4`, nga notebook-u në Kaggle.
 
-### 6.3 Rezultatet kryesore
+### 6.3 Rezultatet: grupi i parë
 
 Kostoja më e mirë dhe mesatarja nga 5 seed-et. Me të trasha është vlera më e mirë e rreshtit, veç për kolonat “më e mira” dhe veç për “mesatarja”.
 
@@ -183,9 +200,76 @@ Kostoja më e mirë dhe mesatarja nga 5 seed-et. Me të trasha është vlera më
 
 Në instancat e tjera ka barazim: 6 sipas mesatares (`grf1`–`grf6`) dhe 8 sipas më të mirës. Gap-i është sa përqind është kostoja e një prove mbi koston më të mirë që gjeti cilido algoritëm për atë instancë.
 
-### 6.4 Qëndrueshmëria dhe numri i iteracioneve
+### 6.4 Rezultatet: grupi i dytë
 
-Devijimi standard i kostos nga 5 seed-et (për `grf1`–`grf6` është pothuajse 0 te të tria):
+Kostoja më e mirë dhe mesatarja nga 5 seed-et, me 60 s për provë. Me të trasha është vlera më e mirë e rreshtit, veç për "më e mira" dhe veç për "mesatarja".
+
+| Instanca | n | Harqe | Marrëdhënie | SA më e mira | SA mesatarja | GRASP më e mira | GRASP mesatarja | ILS më e mira | ILS mesatarja |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `grf101` | 18 | 90 | 1 144 | **16.96** | **16.96** | 16.97 | 16.97 | **16.96** | 17.04 |
+| `grf102` | 22 | 132 | 2 135 | **20.49** | 20.56 | **20.49** | **20.49** | 20.62 | 20.62 |
+| `grf103` | 22 | 110 | 1 824 | 20.67 | 20.67 | **20.54** | **20.54** | 20.67 | 20.77 |
+| `grf104` | 27 | 162 | 3 410 | 25.14 | 25.18 | 25.14 | 25.15 | **25.12** | **25.13** |
+| `grf105` | 26 | 130 | 2 664 | **24.26** | 24.29 | **24.26** | **24.26** | **24.26** | **24.26** |
+| `grf106` | 32 | 192 | 4 985 | **29.57** | **29.63** | **29.57** | 29.65 | **29.57** | 29.64 |
+| `grf107` | 37 | 222 | 6 860 | **34.22** | 34.27 | **34.22** | **34.23** | 34.25 | 34.27 |
+| `grf108` | 37 | 222 | 6 860 | 34.25 | 34.27 | 34.21 | 34.30 | **34.20** | **34.25** |
+| `grf109` | 37 | 222 | 6 860 | 34.34 | 34.39 | 34.28 | **34.29** | **34.24** | 34.32 |
+| `grf110` | 37 | 222 | 6 860 | **34.31** | 34.35 | 34.32 | **34.32** | 34.36 | 34.36 |
+| `grf111` | 42 | 252 | 9 035 | 41.85 | 42.10 | **38.78** | **38.85** | 41.16 | 41.45 |
+| `grf112` | 50 | 350 | 15 168 | 46.18 | 46.24 | 46.13 | 46.17 | **46.07** | **46.14** |
+| `grf113` | 58 | 464 | 23 583 | 55.58 | 56.27 | **53.46** | **53.49** | 55.35 | 55.60 |
+| `grf114` | 66 | 594 | 34 640 | 60.78 | 60.84 | 60.74 | 60.80 | **60.59** | **60.67** |
+| `grf115` | 74 | 740 | 48 699 | 67.84 | 68.01 | 67.94 | 68.01 | **67.79** | **67.90** |
+| `grf116` | 82 | 902 | 66 120 | 75.23 | 75.32 | 75.22 | 75.30 | **75.08** | **75.18** |
+| `grf117` | 52 | 312 | 14 285 | **47.98** | 48.08 | 48.08 | 48.13 | 48.00 | **48.00** |
+| `grf118` | 62 | 434 | 23 988 | 56.94 | 57.03 | 57.00 | 57.09 | **56.88** | **56.97** |
+| `grf119` | 72 | 576 | 37 303 | 66.09 | 66.25 | 66.15 | 66.23 | **66.01** | **66.12** |
+| `grf120` | 82 | 738 | 54 800 | 75.46 | 75.56 | 75.42 | 75.46 | **75.26** | **75.32** |
+| `grf121` | 92 | 920 | 77 049 | 84.44 | 84.62 | 84.48 | 84.51 | **84.20** | **84.35** |
+| `grf122` | 102 | 1 122 | 104 620 | 93.52 | 93.63 | 93.54 | 93.66 | **93.33** | **93.44** |
+| `grf123` | 62 | 372 | 20 735 | 57.32 | 57.37 | 57.12 | 57.25 | **57.03** | **57.12** |
+| `grf124` | 74 | 518 | 34 824 | 68.03 | 68.29 | 68.16 | 68.19 | **67.95** | **67.99** |
+| `grf125` | 86 | 688 | 54 159 | 79.09 | 79.25 | 78.96 | 79.08 | **78.91** | **78.95** |
+| `grf126` | 98 | 882 | 79 568 | 89.91 | 90.02 | 89.98 | 90.07 | **89.75** | **89.84** |
+| `grf127` | 110 | 1 100 | 111 879 | 100.90 | 101.08 | 100.74 | 100.91 | **100.61** | **100.71** |
+| `grf128` | 122 | 1 342 | 151 920 | 111.73 | 111.87 | 111.82 | 111.88 | **111.53** | **111.69** |
+| `grf129` | 72 | 432 | 28 385 | 66.59 | 66.68 | 66.43 | 66.51 | **66.25** | **66.38** |
+| `grf130` | 86 | 602 | 47 676 | 79.28 | 79.34 | 79.12 | 79.21 | **78.89** | **78.97** |
+| `grf131` | 100 | 800 | 74 151 | 91.97 | 92.04 | 91.86 | 91.97 | **91.60** | **91.71** |
+| `grf132` | 114 | 1 026 | 108 944 | 104.59 | 104.83 | 104.60 | 104.67 | **104.30** | **104.43** |
+| `grf133` | 128 | 1 280 | 153 189 | 125.67 | 127.05 | **117.17** | **117.32** | 123.61 | 124.61 |
+| `grf134` | 142 | 1 562 | 208 020 | 130.33 | 130.40 | 130.06 | 130.19 | **129.84** | **129.95** |
+
+**Përmbledhje për 34 instancat e grupit të dytë:**
+
+| | SA | GRASP | ILS |
+|---|---:|---:|---:|
+| Fitore sipas mesatares | 2 | 8 | **23** |
+| Fitore sipas më të mirës | 2 | 4 | **23** |
+| Gap-i mesatar ndaj më të mirës së njohur | 0.98% | **0.24%** | 0.68% |
+| Gap-i mediane | 0.38% | 0.26% | **0.14%** |
+| Gap-i maksimal | 9.62% | **0.64%** | 7.56% |
+| Provat që arritën më të mirën e njohur | 8.8% | 13.5% | **23.5%** |
+| Devijimi standard mesatar nga seed-et | 0.122 | **0.043** | 0.093 |
+
+Në 1 instancë ka barazim sipas mesatares dhe në 5 sipas më të mirës.
+
+**Përmbledhje për të gjitha 52 instancat unike (18 + 34):**
+
+| | SA | GRASP | ILS |
+|---|---:|---:|---:|
+| Fitore sipas mesatares | 2 | 9 | **34** |
+| Fitore sipas më të mirës | 2 | 6 | **31** |
+| Gap-i mesatar | 1.40% | **0.62%** | 0.68% |
+| Gap-i mediane | 0.44% | 0.28% | **0.13%** |
+| Provat që arritën më të mirën e njohur | 16.5% | 23.1% | **33.5%** |
+
+Barazim ka në 7 instanca sipas mesatares dhe në 13 sipas më të mirës.
+
+### 6.5 Qëndrueshmëria dhe numri i iteracioneve
+
+Devijimi standard i kostos nga 5 seed-et në grupin e parë (për `grf1`–`grf6` është pothuajse 0 te të tria):
 
 | Instanca | SA | GRASP | ILS |
 |---|---:|---:|---:|
@@ -202,7 +286,7 @@ Devijimi standard i kostos nga 5 seed-et (për `grf1`–`grf6` është pothuajse
 | `grf17` | 1.09 | 0.45 | 1.73 |
 | `grf18` | 2.46 | 1.22 | 0.87 |
 
-Numri mesatar i iteracioneve në 60 s:
+Numri mesatar i iteracioneve në 60 s, grupi i parë:
 
 | Instanca | n | SA | GRASP | ILS |
 |---|---:|---:|---:|---:|
@@ -217,9 +301,22 @@ Numri mesatar i iteracioneve në 60 s:
 
 SA bën miliona iteracione të lira. GRASP-i dhe ILS-i bëjnë vetëm dhjetëra deri në mijëra iteracione, sepse secili përmban një kërkim lokal të plotë. Në instancat me n = 60 (`grf13`, `grf14`) janë vetëm 4–5 iteracione në minutë, dhe megjithatë ILS-i jep rezultatin më të mirë. Kjo tregon se cilësia e lagjes (segmentet e gjata) ka më shumë rëndësi se numri i iteracioneve.
 
-### 6.5 Krahasimi me versionin e parë
+Numri mesatar i iteracioneve në 60 s, grupi i dytë:
 
-Versioni i parë kishte vetëm SA, me segmente 1–3 dhe vlerësim të plotë, 500 000 iteracione ose 60 s, dhe u ekzekutua në kompjuter tjetër. Rezultatet e tij ruhen te `results/sa_v1/`.
+| Instanca | n | SA | GRASP | ILS |
+|---|---:|---:|---:|---:|
+| `grf101` | 18 | 9 082 380 | 8 774 | 21 554 |
+| `grf110` | 37 | 8 747 020 | 1 363 | 2 268 |
+| `grf116` | 82 | 5 395 200 | 54 | 77 |
+| `grf122` | 102 | 5 544 060 | 33 | 48 |
+| `grf128` | 122 | 5 480 080 | 23 | 32 |
+| `grf134` | 142 | 5 281 660 | 16 | 24 |
+
+Në grafet e rralla SA "bën" miliona iteracione, por shumica e lëvizjeve hidhen menjëherë, sepse krijojnë harqe që nuk ekzistojnë. Te instancat më të mëdha (`grf134`, 142 nyje) GRASP-i dhe ILS-i bëjnë vetëm 16–24 iteracione në minutë.
+
+### 6.6 Krahasimi me versionin e parë
+
+Versioni i parë kishte vetëm SA dhe vetëm grupin e parë të instancave, me segmente 1–3 dhe vlerësim të plotë, 500 000 iteracione ose 60 s, dhe u ekzekutua në kompjuter tjetër. Rezultatet e tij ruhen te `results/sa_v1/`.
 
 | Instanca | Kostoja fillestare (backtracking) | SA v1 | Më e mira e re | Algoritmi | Përmirësimi ndaj SA v1 |
 |---|---:|---:|---:|---|---:|
@@ -244,32 +341,72 @@ Versioni i parë kishte vetëm SA, me segmente 1–3 dhe vlerësim të plotë, 5
 
 Përmirësimi është në 11 nga 18 instancat. Në 6 instancat e vogla (n = 20) të gjitha versionet gjejnë të njëjtën kosto. Vetëm te `grf7` versioni i parë mbetet pak më i mirë (193.95 kundrejt 194.06).
 
-## 7. Diskutim
+## 7. Post-optimizimi: zgjidhjet më të mira të njohura
+
+Pas eksperimenteve u bë edhe një hap i veçantë post-optimizimi (`python src/main.py te_gjitha --permireso --koha 60 --raunde 3`). Për çdo instancë merret zgjidhja më e mirë e njohur (nga SA, GRASP, ILS ose SA v1) dhe ILS-i niset prej saj me 4 seed-e paralelisht, 60 s për raund. Nëse raundi e përmirëson rekordin, raundi tjetër nis nga rekordi i ri, deri në 3 raunde. Për grupin e parë u bënë dy ekzekutime të tilla njëri pas tjetrit, ku i dyti vazhdoi nga rekordet e të parit. Rekordet ruhen te `results/me_te_mirat_e_njohura/`.
+
+**Këto rezultate nuk krahasohen me tabelat e seksionit 6.** Post-optimizimi merr shumë më shumë kohë gjithsej dhe nis nga rezultatet e algoritmeve, prandaj nuk është krahasim i drejtë mes algoritmeve. Rezultatet e `results/sa`, `grasp` dhe `ils` nuk preken.
+
+Instancat ku u gjet rekord i ri:
+
+| Instanca | Më e mira e algoritmeve (60 s) | Burimi | **Rekordi** | Përmirësimi |
+|---|---:|---|---:|---:|
+| `grf7` | 193.95 | SA v1 | **191.82** | 1.10% |
+| `grf9` | 185.54 | ILS | **183.35** | 1.18% |
+| `grf11` | 206.39 | ILS | **206.20** | 0.09% |
+| `grf13` | 291.48 | ILS | **290.26** | 0.42% |
+| `grf14` | 63.42 | ILS | **62.04** | 2.18% |
+| `grf15` | 277.03 | GRASP | **276.97** | 0.02% |
+| `grf16` | 70.02 | GRASP | **68.43** | 2.27% |
+| `grf17` | 301.82 | ILS | **296.24** | 1.85% |
+| `grf18` | 81.67 | ILS | **80.58** | 1.33% |
+| `grf111` | 38.78 | GRASP | **38.74** | 0.10% |
+| `grf112` | 46.07 | ILS | **46.06** | 0.02% |
+| `grf113` | 53.46 | GRASP | **53.32** | 0.26% |
+| `grf115` | 67.79 | ILS | **67.77** | 0.03% |
+| `grf116` | 75.08 | ILS | **75.07** | 0.01% |
+| `grf120` | 75.26 | ILS | **75.15** | 0.15% |
+| `grf122` | 93.33 | ILS | **93.22** | 0.12% |
+| `grf125` | 78.91 | ILS | **78.88** | 0.04% |
+| `grf126` | 89.75 | ILS | **89.68** | 0.08% |
+| `grf127` | 100.61 | ILS | **100.45** | 0.16% |
+| `grf128` | 111.53 | ILS | **111.39** | 0.13% |
+| `grf129` | 66.25 | ILS | **66.19** | 0.09% |
+| `grf131` | 91.60 | ILS | **91.49** | 0.12% |
+| `grf132` | 104.30 | ILS | **104.22** | 0.08% |
+| `grf133` | 117.17 | GRASP | **116.81** | 0.31% |
+| `grf134` | 129.84 | ILS | **129.61** | 0.18% |
+
+Gjithsej u përmirësuan **25 nga 52** instancat unike: 9 në grupin e parë (deri në 2.27%, te `grf16`) dhe 16 në të dytin (deri në 0.31%, te `grf133`). Përmirësimet në grupin e dytë janë më të vogla, sepse aty algoritmet ishin tashmë shumë afër njëri-tjetrit. Kjo tregon se ILS-i nga një pikënisje e mirë mund ta përmirësojë zgjidhjen më shumë sesa kur nis nga rruga e backtracking-ut: koha nuk harxhohet për të arritur te zona e mirë.
+
+## 8. Diskutim
 
 - **ILS** del më i miri dhe më i qëndrueshmi. Kombinimi i lagjes së plotë (segmente të çfarëdo gjatësie) me perturbim të vogël e lejon të dalë nga optimumet lokale pa e humbur strukturën e mirë të zgjidhjes.
 - **GRASP-i** është i dyti. Pati koston më të mirë në `grf15` dhe `grf16`, instancat me më shumë marrëdhënie trigger (rreth 4.5 milionë), dhe mesataren më të mirë në `grf15`. Aty ndërtimi që i llogarit trigger-at që në fillim jep pika nisjeje shumë më të mira se backtracking-u, që i sheh vetëm kostot bazë. Dobësia e tij është që iteracionet nuk mësojnë nga njëra-tjetra.
 - **SA** bën shumë më shumë iteracione, por me lëvizje të rastit. Ka mesataren më të keqe dhe luhatet më shumë nga seed-i në seed. Megjithatë është i thjeshtë dhe nuk ka nevojë për kërkim lokal të shtrenjtë.
 - Në instancat e vogla (n = 20) të tria arrijnë të njëjtën kosto. Kjo sugjeron që ajo kosto është afër optimumit, por nuk është provuar optimale.
+- **Dallimi mes grupeve.** Në grafet e dendura (grupi i parë) ILS-i dominon qartë. Në grafet e rralla (grupi i dytë) ILS-i fiton në shumicën e instancave, sidomos te ato të mëdha (`grf114`–`grf134`), por GRASP-i është më i qëndrueshmi. Arsyeja është pikënisja: SA dhe ILS nisin nga e njëjta rrugë fillestare (Warnsdorff), dhe në graf të rrallë shumica e lëvizjeve krijojnë harqe që nuk ekzistojnë. Te `grf111`, `grf113` dhe `grf133` kjo i la SA-në dhe ILS-in 4–9% më keq se GRASP-i, i cili ndërton qindra rrugë të ndryshme. Pra, në grafe të rralla diversiteti i pikënisjeve ka më shumë rëndësi sesa në grafe të dendura.
 - Rezultatet për `grf19`–`grf21` dalin pothuajse të njëjta me ato të kopjeve të tyre, gjë që konfirmon që algoritmet janë të qëndrueshme. Dallimet e vogla vijnë nga koha: me kufi kohor, numri i iteracioneve ndryshon pak nga një ekzekutim në tjetrin.
 
 ### Kufizimet
 
 - Algoritmet janë heuristika dhe nuk garantojnë optimumin global.
-- Zgjidhjet nuk janë kontrolluar ende me validuesin zyrtar të konkursit. U kontrolluan me vlerësuesin e programit dhe me një vlerësues të dytë të pavarur.
-- Kufiri kohor e bën rezultatin të varur nga shpejtësia e kompjuterit, prandaj të gjitha provat përfundimtare u bënë në të njëjtin kompjuter.
+- Validuesi zyrtar i konkursit (*Test a Solution*) nuk mund të përdorej, sepse pas përfundimit të garës portali nuk ofron më instanca për testim. Zgjidhjet u verifikuan me vlerësuesin e programit dhe me një vlerësues të dytë të pavarur, që i zbatojnë rregullat e konkursit.
+- Kufiri kohor e bën rezultatin të varur nga shpejtësia e kompjuterit, prandaj të gjitha provat përfundimtare u bënë në të njëjtin lloj kompjuteri (Kaggle CPU).
 - `grf15` dhe `grf16` janë shumë të mëdha për GitHub. Për riprodhim duhet të shtohen veçmas (në Kaggle si Dataset).
 - Python-i i pastër e kufizon shpejtësinë. Një version me numba ose në gjuhë të kompiluar do të bënte shumë më shumë iteracione.
 
-## 8. Përfundim
+## 9. Përfundim
 
-U implementuan dhe u krahasuan tre metaheuristika për Trigger Arc TSP mbi të njëjtën bazë kodi: leximi me tabelë kompakte të trigger-ave, vlerësimi i pjesshëm me ndërprerje të hershme, dhe lëvizjet 3-opt që e ruajnë drejtimin. Me kohë të barabartë, **ILS dha rezultatet më të mira dhe më të qëndrueshme**, GRASP-i ishte i dyti dhe më i miri në instancat më të mëdha, ndërsa SA-ja ishte e treta. Krahasuar me versionin e parë, kostot më të mira u përmirësuan deri në 6.26%.
+U implementuan dhe u krahasuan tre metaheuristika për Trigger Arc TSP mbi të njëjtën bazë kodi: leximi me tabelë kompakte të trigger-ave, vlerësimi i pjesshëm me ndërprerje të hershme, lëvizjet 3-opt që e ruajnë drejtimin, dhe ndërtimi me rregullin e Warnsdorff-it dhe prerje për grafe të rralla. Në të 55 instancat e konkursit, me kohë të barabartë, **ILS dha rezultatet më të mira** (mesatarja më e mirë në 34 nga 52 instanca unike), **GRASP-i ishte më i qëndrueshmi**, veçanërisht në grafet e rralla, ndërsa SA-ja ishte e treta. Krahasuar me versionin e parë, kostot më të mira u përmirësuan deri në 6.26%, dhe me post-optimizim u gjetën rekorde të reja në 25 instanca.
 
-Hapa të mundshëm më tej: kontrolli me validuesin zyrtar, *path relinking* te GRASP-i, kombinimi i ndërtimit të GRASP-it me ILS-in, dhe një version më i shpejtë i funksionit të kostos (numba).
+Hapa të mundshëm më tej: ILS i nisur nga ndërtimet e GRASP-it për grafe të rralla, *path relinking* te GRASP-i, dhe një version më i shpejtë i funksionit të kostos (numba).
 
 ## Si riprodhohen rezultatet
 
 ```bash
-python src/main.py te_gjitha --koha 60 --procese 4
+python src/main.py te_gjitha --koha 60 --procese 4                 # të tria algoritmet
+python src/main.py te_gjitha --permireso --koha 60 --raunde 3      # post-optimizimi
 ```
 
 Ose në Kaggle me notebook-un `notebooks/Trigger_Arc_TSP_Kaggle.ipynb`, i cili e ekzekuton programin dhe i nxjerr tabelat dhe grafikët. Rezultatet ruhen veç për secilin algoritëm te `results/sa/`, `results/grasp/` dhe `results/ils/`, ndërsa krahasimi te `results/krahasimi.csv`.
