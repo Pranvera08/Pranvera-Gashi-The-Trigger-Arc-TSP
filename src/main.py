@@ -13,6 +13,10 @@ Rezultatet:
     results/<algoritmi>/konvergjenca.csv    kostoja më e mirë me kalimin e kohës
     results/<algoritmi>/zgjidhjet/<inst>.txt rruga më e mirë e gjetur ndonjëherë
     results/krahasimi.csv                   krahasimi i algoritmeve për çdo instancë
+
+Post-optimizimi (ILS nga zgjidhja më e mirë e njohur, rezultatet e algoritmeve nuk preken):
+    python src/main.py te_gjitha --permireso --koha 60 --raunde 3
+    -> results/me_te_mirat_e_njohura/ (rekordet, historia.csv, permbledhja.csv)
 """
 import argparse
 import csv
@@ -30,6 +34,7 @@ from instanca import ngarko
 from kosto import llogarit_koston
 from ndertimi import nderto_rruge_fillestare
 from sa import simulated_annealing
+import permireso
 
 DOSJA = Path(__file__).resolve().parent.parent
 INSTANCAT = DOSJA / "instances"
@@ -225,6 +230,10 @@ def main():
     p.add_argument("--koha", type=float, default=60.0, help="sekonda për çdo provë")
     p.add_argument("--procese", type=int, default=max(1, (os.cpu_count() or 1)),
                    help="sa prova njëherësh (bërthama CPU)")
+    p.add_argument("--permireso", action="store_true",
+                   help="post-optimizim: ILS nga zgjidhja më e mirë e njohur")
+    p.add_argument("--raunde", type=int, default=3,
+                   help="(me --permireso) sa raunde maksimalisht për instancë")
     a = p.parse_args()
 
     # Kur ekzekutohet pa argumente (p.sh. me Run në PyCharm), përdoret kjo instancë.
@@ -236,6 +245,13 @@ def main():
         emrat = sorted((f.stem for f in INSTANCAT.glob("grf*.txt")), key=_rendit)
     else:
         emrat = a.instancat
+
+    if a.permireso:
+        for emri in emrat:
+            permireso.permireso_instancen(emri, INSTANCAT, REZULTATET, a.koha, a.raunde, a.procese)
+            permireso.perditeso_permbledhjen(REZULTATET)
+        print(f"\nRekordet u ruajtën te: {REZULTATET / 'me_te_mirat_e_njohura'}")
+        return
 
     for emri in emrat:
         ekzekuto_instancen(emri, a.alg, a.seeds, a.koha, a.procese)

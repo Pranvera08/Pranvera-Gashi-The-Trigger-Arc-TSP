@@ -26,9 +26,11 @@ Zgjidhja fillestare për SA dhe ILS ndërtohet me backtracking (`src/ndertimi.py
 - `src/levizjet.py`: lëvizjet insertion/swap, perturbimi dhe kërkimi lokal
 - `src/ndertimi.py`: backtracking dhe ndërtimi i GRASP
 - `src/sa.py`, `src/grasp.py`, `src/ils.py`: algoritmet
+- `src/permireso.py`: post-optimizimi (ILS nga zgjidhja më e mirë e njohur)
 - `instances/`: instancat (`grf15.txt` dhe `grf16.txt` janë shumë të mëdha dhe nuk ruhen në Git; `grf19`–`grf21` janë kopje të `grf2`, `grf8`, `grf14`)
 - `results/<algoritmi>/`: rezultatet për secilin algoritëm veç e veç (shih më poshtë)
 - `results/krahasimi.csv`: krahasimi i tre algoritmeve për çdo instancë
+- `results/me_te_mirat_e_njohura/`: rekordet e post-optimizimit
 - `results/sa_v1/`: rezultatet e versionit të parë (kodi i tij gjendet në historinë e Git-it)
 - `notebooks/Trigger_Arc_TSP_Kaggle.ipynb`: e ekzekuton `main.py` në Kaggle dhe i analizon rezultatet (tabela dhe grafikë)
 - `REPORT.md`: raporti i projektit
@@ -47,6 +49,16 @@ python src/main.py grf1 --seeds 1 2 3 --koha 10 --procese 4
 - `--koha`: sekonda për çdo provë (seed); të gjitha algoritmet marrin kohë të barabartë
 - `--seeds`: cilat seed-e (parazgjedhje 1 2 3 4 5)
 - `--procese`: sa prova ekzekutohen paralelisht (parazgjedhje: numri i bërthamave)
+
+## Post-optimizimi ("përmirëso")
+
+Pas eksperimenteve, zgjidhjet më të mira mund të përmirësohen edhe më shumë: ILS-i niset nga zgjidhja më e mirë e njohur për çdo instancë (nga SA, GRASP, ILS, SA v1 ose rekordi i mëparshëm), me disa seed-e paralelisht, në disa raunde.
+
+```bash
+python src/main.py te_gjitha --permireso --koha 60 --raunde 3
+```
+
+Rekordet ruhen te `results/me_te_mirat_e_njohura/` (`grf*.txt`, `historia.csv`, `permbledhja.csv`). Rezultatet e `results/sa`, `grasp` dhe `ils` nuk preken, prandaj krahasimi i algoritmeve mbetet i drejtë. Çdo ekzekutim i ri vazhdon nga rekordet e fundit.
 
 ## Ekzekutimi në Kaggle
 
