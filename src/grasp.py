@@ -34,12 +34,17 @@ def grasp(ktx, seed=1, koha_max=60.0, alfa_min=0.0, alfa_max=0.3,
     historia = []
     iteracione = 0
     deshtime = 0
+    me_prerje = False
 
     while time.perf_counter() < koha_fund and iteracione < maks_iteracione:
         alfa = g.uniform(alfa_min, alfa_max)
-        rruga = nderto_grasp(ktx, alfa, g)
+        rruga = nderto_grasp(ktx, alfa, g, me_prerje=me_prerje)
         if rruga is None:
             deshtime += 1
+            # Në grafe të rralla ndërtimi i thjeshtë mund të mos ketë sukses
+            # asnjëherë: pas 200 dështimeve rresht pa asnjë rrugë, ndizet prerja.
+            if not me_prerje and me_e_mira is None and deshtime >= 200:
+                me_prerje = True
             continue
 
         gjendja = Gjendja(ktx, rruga)
@@ -62,5 +67,6 @@ def grasp(ktx, seed=1, koha_max=60.0, alfa_min=0.0, alfa_max=0.3,
         "kosto_fillestare": kosto_fillestare,
         "iteracione": iteracione,
         "deshtime": deshtime,
+        "me_prerje": me_prerje,
         "historia": historia,
     }
